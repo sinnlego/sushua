@@ -1,0 +1,161 @@
+<！doctype 超文本标记语言>
+<超文本标记语言 朗="zh-CN">
+<头>
+<元 字符集="UTF-8">
+<标题>小安速刷</标题>
+<风格>
+正文{字体系列：Arial；最大宽度：800px；边距：2rem自动；填充：01rem；下边距：8rem；}
+.页{显示：无；填充：2rem；背景：#f5f5f5；边框半径：8px；}
+.页.活跃的{显示:块；}
+H2{上边距：0；}
+/* 弹窗公告样式 */
+.模态覆盖{位置：固定；顶部：0；左侧：0；右侧：0；底部：0；背景：RGBA(0,0,0,0.5); z索引：9999；显示：柔线；对齐项目：居中；对齐内容：居中；}0，0.5)；z索引：9999；显示：柔线；对齐项目：居中；对齐内容：居中；}
+.modal-content{背景：白色；填充：2rem；边框半径：8px；宽度：90%；最大宽度：500px；位置：相对；}
+.modal-title{color：#856404；font-size:1.2rem；上边距：0；下边距：1rem；文字对齐：居中；}
+.modal-text{color：#856404；font-weight：粗体；文本对齐：居中；线高：1.5；}
+.close-btn{position:absolute；顶部：1rem；右侧：1rem；背景：透明；边框：无；字体大小：1.5rem；光标：指针；颜色：#856404；填充：0.5rem；}
+输入{宽度：70%；填充：0.8rem；右边距：0.5rem；边框：1px实心#ddd；边框半径：4px；}
+按钮{填充：0.8rem1.5rem；边框：无；边框半径：4px；光标：指针；字体粗细：粗体；颜色：白色；}
+.like-btn{background：#007bff；}
+.follow-btn{background：#28a745；}
+#likeResult，#followResult{上边距：1.5rem；填充：1rem；背景：白色；边框半径：4px；最小高度：40px；字体粗细：粗体；}
+.Success{color：#28a745；}
+.error{color：#dc3545；}
+.作者{上边距：1rem；文字对齐：居中；颜色：#666；字体粗细：粗体；}
+.bottom-tab{位置：固定；底部：0；左：0；右：0；背景：白色；显示：弯曲；框阴影：0-2px10px rgba(0,0,0,0.1);}
+.tab-btn{flex:1；填充：1rem0；边框：无；背景：透明；光标：指针；字体粗细：粗体；字体大小：1rem；颜色：#666；}
+.tab-btn.活动{color：#007bff；border-bottom:3px solid#007bff；}
+。tab-btn.follow-active{color：#28a745；border-bottom:3px solid#28a745；}
+</风格>
+</头>
+<身体>
+<! -- 弹窗公告（页面加载后居中显示） -->
+<div 班级="模态覆盖"身份标识="noticeModal">
+<div 班级="模态-内容">
+<按钮 班级="close-btn"onClick="closeModal()"()">×</按钮>
+<H3 班级="模态标题">📢    重要公告</H3>
+<div 班级="模态文本">快手作品暂时仅支持刷10个点赞<溴>加入QQ群：1073822261获取更多功能</div>
+</div>
+</div>
+
+<div 身份标识="likePage"班级="页面活动">
+<H2>快手视频点赞刷取</H2>
+<输入 类型="文本"身份标识="likeUrl"占位符="输入快手视频链接"必需的>
+<按钮 班级="like-btn"onClick="callLikeApi()"()">开始刷取</按钮>
+<div 身份标识="likeResult">请点击按钮调用接口</div>
+<div 班级="作者">认准小安1073822261</div>
+</div>
+
+<div 身份标识="followPage"班级="页面">
+<H2>快手用户关注刷取</H2>
+<输入 类型="文本"身份标识="followUrl"占位符="输入快手用户链接"必需的>
+<按钮 班级="follow-btn"onClick="callFollowApi()"()">开始刷取</按钮>
+<div 身份标识="followResult">请点击按钮调用接口</div>
+<div 班级="作者">认准小安1073822261</div>
+</div>
+
+<div 班级="底部标签">
+<按钮 班级="tab-btn活动"onClick="switchPage('like')"('like')">点赞刷取</按钮>
+<按钮班级="tab-btn"onclick="switchPage('follow')">关注刷取</按钮>
+</div>
+
+<脚本>
+// 关闭弹窗公告
+函数closeModal(){
+文件。getElementById('noticeModal')。风格。显示='无'；
+        }
+
+功能switchPage(类型){
+Const likePage=document.getElementById('likePage')；
+Const followPage=document.getElement BYID('followPage')；
+常量likeTab=文件.querySelector('.tab-btn:nth-child(1)')；
+常数followTab=文件.querySelector('.tab-btn:nth-child(2)')；
+
+if(type==='like'){
+likePage.classList.add('active')；
+followPage.classList.remove('active')；
+likeTab.classList.add('active')；
+likeTab.classList.remove('follow-active')；
+followTab.classList.remove('active'，'follow-active')；
+}else{
+followPage.classList.add('active')；
+likePage.classList.remove('active')；
+followTab.classList.add('active'，'follow-active')；
+likeTab.classList.remove('active')；
+            }
+        }
+
+异步函数callLikeApi(){
+常数ksUrl=文件。getElementById('likeUrl')。价值。修剪()；
+Const resultDom=document.getElementById('likeResult')；
+            
+if(！ksUrl){
+resultDom.className='error'；
+resultDom.textContent='请输入有效的快手视频链接'；
+返回；
+            }
+
+resultDom.textContent='正在刷取点赞...'；
+const apiUrl='http://qwtgbot.lilys.top/qwapi.php?url=${encodeURIComponent(ksUrl)}&tid=3139'；
+
+尝试{
+常数响应=等待提取(apiUrl，{
+方法：'得到'，
+模式：'no-cors'，
+标题：{
+'接受'：'*/*'，
+'用户代理'：'Mozilla/5.0(iPhone；CPU iPhone OS16_0，如Mac OS X)AppleWebKit/605。1.15(KHTML，如Gecko)版本/16.0Mobile/15E148Safari/604.1'
+                    }
+                });
+
+if(response.type==='operque'){
+resultDom.className='success'；
+resultDom.textContent='已成功刷取点赞'；
+}else{
+resultDom.className='error'；
+resultDom.textContent='刷取失败，请重试'；
+                }
+}catch(错误){
+resultDom.className='error'；
+resultDom.textContent='刷取失败，请重试'；
+            }
+        }
+
+异步函数callFollowApi(){
+常数ksUrl=文件。getElementById('followUrl')。价值。修剪()；
+Const resultDom=document.getElementById('followResult')；
+            
+if(！ksUrl){
+resultDom.className='error'；
+resultDom.textContent='请输入有效的快手用户链接'；
+返回；
+            }
+
+resultDom.textContent='正在刷取关注...'；
+const apiUrl='http://qwtgbot.lilys.top/qwapi.php?url=${encodeURIComponent(ksUrl)}&tid=5378'；
+
+尝试{
+常数响应=等待提取(apiUrl，{
+方法：'得到'，
+模式：'no-cors'，
+标题：{
+'接受'：'*/*'，
+'用户代理'：'Mozilla/5.0(iPhone；CPU iPhone OS16_0，如Mac OS X)AppleWebKit/605。1.15(KHTML，如Gecko)版本/16.0Mobile/15E148Safari/604.1'
+                    }
+                });
+
+if(response.type==='operque'){
+resultDom.className='success'；
+resultDom.textContent='已成功刷取关注'；
+}else{
+resultDom.className='error'；
+resultDom.textContent='刷取失败，请重试'；
+                }
+}catch(错误){
+resultDom.className='error'；
+resultDom.textContent='刷取失败，请重试'；
+            }
+        }
+>脚本>
+</身体>
+</超文本标记语言>
