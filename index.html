@@ -2,34 +2,154 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>小安速刷</title>
     <style>
-        body { font-family: Arial; max-width: 800px; margin: 2rem auto; padding: 0 1rem; margin-bottom: 8rem; }
-        .page { display: none; padding: 2rem; background: #f5f5f5; border-radius: 8px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial; 
+            width: 100vw; 
+            height: 100vh; 
+            padding: 2rem 1rem;
+            padding-bottom: 8rem;
+            background: #f8f9fa;
+            overflow-x: hidden;
+        }
+        .page { 
+            display: none; 
+            width: 100%;
+            background: #f5f5f5; 
+            padding: 2rem 1.5rem; 
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
         .page.active { display: block; }
-        h2 { margin-top: 0; }
-        /* 弹窗公告样式 */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 500px; position: relative; }
-        .modal-title { color: #856404; font-size: 1.2rem; margin-top: 0; margin-bottom: 1rem; text-align: center; }
-        .modal-text { color: #856404; font-weight: bold; text-align: center; line-height: 1.5; }
-        .close-btn { position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: #856404; padding: 0 0.5rem; }
-        input { width: 70%; padding: 0.8rem; margin-right: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
-        button { padding: 0.8rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; }
+        h2 { 
+            margin-bottom: 1.5rem; 
+            font-size: 1.4rem;
+            color: #333;
+            text-align: center;
+        }
+        /* 弹窗公告 */
+        .modal-overlay { 
+            position: fixed; 
+            top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(0,0,0,0.5); 
+            z-index: 9999; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .modal-content { 
+            background: white; 
+            padding: 2rem 1.5rem; 
+            border-radius: 8px; 
+            width: 90%; 
+            max-width: 400px; 
+            position: relative;
+        }
+        .modal-title { 
+            color: #856404; 
+            font-size: 1.2rem; 
+            margin-top: 0; 
+            margin-bottom: 1rem; 
+            text-align: center; 
+        }
+        .modal-text { 
+            color: #856404; 
+            font-weight: bold; 
+            text-align: center; 
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        .close-btn { 
+            position: absolute; 
+            top: 1rem; right: 1rem; 
+            background: #ffeeee; 
+            border: 1px solid #dc3545; 
+            border-radius: 50%; 
+            width: 30px; 
+            height: 30px; 
+            font-size: 1.2rem; 
+            cursor: pointer; 
+            color: #dc3545; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 0;
+        }
+        input { 
+            width: 100%; 
+            padding: 1rem; 
+            margin-bottom: 1rem; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 1rem;
+        }
+        button { 
+            width: 100%; 
+            padding: 1rem; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 1.1rem;
+            color: white;
+        }
         .like-btn { background: #007bff; }
         .follow-btn { background: #28a745; }
-        #likeResult, #followResult { margin-top: 1.5rem; padding: 1rem; background: white; border-radius: 4px; min-height: 40px; font-weight: bold; }
+        #likeResult, #followResult { 
+            margin-top: 1.5rem; 
+            padding: 1rem; 
+            background: white; 
+            border-radius: 8px; 
+            min-height: 50px; 
+            font-weight: bold; 
+            font-size: 1rem;
+            text-align: center;
+            color: #666;
+        }
         .success { color: #28a745; }
         .error { color: #dc3545; }
-        .author { margin-top: 1rem; text-align: center; color: #666; font-weight: bold; }
-        .bottom-tab { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
-        .tab-btn { flex: 1; padding: 1rem 0; border: none; background: transparent; cursor: pointer; font-weight: bold; font-size: 1rem; color: #666; }
-        .tab-btn.active { color: #007bff; border-bottom: 3px solid #007bff; }
-        .tab-btn.follow-active { color: #28a745; border-bottom: 3px solid #28a745; }
+        .author { 
+            margin-top: 1.5rem; 
+            text-align: center; 
+            color: #666; 
+            font-weight: bold; 
+            font-size: 0.9rem;
+        }
+        /* 底部固定切换栏 */
+        .bottom-tab { 
+            position: fixed; 
+            bottom: 0; left: 0; right: 0; 
+            background: white; 
+            display: flex; 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            height: 6rem;
+            align-items: center;
+        }
+        .tab-btn { 
+            flex: 1; 
+            height: 100%;
+            border: none; 
+            background: transparent; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 1.1rem; 
+            color: #666;
+        }
+        .tab-btn.active { 
+            color: #007bff; 
+            border-bottom: 3px solid #007bff; 
+        }
+        .tab-btn.follow-active { 
+            color: #28a745; 
+            border-bottom: 3px solid #28a745; 
+        }
     </style>
 </head>
 <body>
-    <!-- 弹窗公告（页面加载后居中显示） -->
+    <!-- 弹窗公告 -->
     <div class="modal-overlay" id="noticeModal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal()">×</button>
@@ -42,7 +162,7 @@
         <h2>快手视频点赞刷取</h2>
         <input type="text" id="likeUrl" placeholder="输入快手视频链接" required>
         <button class="like-btn" onclick="callLikeApi()">开始刷取</button>
-        <div id="likeResult">请点击按钮调用接口</div>
+        <div id="likeResult"></div>
         <div class="author">认准小安1073822261</div>
     </div>
 
@@ -50,7 +170,7 @@
         <h2>快手用户关注刷取</h2>
         <input type="text" id="followUrl" placeholder="输入快手用户链接" required>
         <button class="follow-btn" onclick="callFollowApi()">开始刷取</button>
-        <div id="followResult">请点击按钮调用接口</div>
+        <div id="followResult"></div>
         <div class="author">认准小安1073822261</div>
     </div>
 
@@ -60,7 +180,6 @@
     </div>
 
     <script>
-        // 关闭弹窗公告
         function closeModal() {
             document.getElementById('noticeModal').style.display = 'none';
         }
