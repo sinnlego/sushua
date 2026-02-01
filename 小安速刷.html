@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>小安速刷</title>
+    <style>
+        body { font-family: Arial; max-width: 800px; margin: 2rem auto; padding: 0 1rem; margin-bottom: 8rem; }
+        .page { display: none; padding: 2rem; background: #f5f5f5; border-radius: 8px; }
+        .page.active { display: block; }
+        h2 { margin-top: 0; }
+        /* 弹窗公告样式 */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 500px; position: relative; }
+        .modal-title { color: #856404; font-size: 1.2rem; margin-top: 0; margin-bottom: 1rem; text-align: center; }
+        .modal-text { color: #856404; font-weight: bold; text-align: center; line-height: 1.5; }
+        .close-btn { position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: #856404; padding: 0 0.5rem; }
+        input { width: 70%; padding: 0.8rem; margin-right: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 0.8rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; }
+        .like-btn { background: #007bff; }
+        .follow-btn { background: #28a745; }
+        #likeResult, #followResult { margin-top: 1.5rem; padding: 1rem; background: white; border-radius: 4px; min-height: 40px; font-weight: bold; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .author { margin-top: 1rem; text-align: center; color: #666; font-weight: bold; }
+        .bottom-tab { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        .tab-btn { flex: 1; padding: 1rem 0; border: none; background: transparent; cursor: pointer; font-weight: bold; font-size: 1rem; color: #666; }
+        .tab-btn.active { color: #007bff; border-bottom: 3px solid #007bff; }
+        .tab-btn.follow-active { color: #28a745; border-bottom: 3px solid #28a745; }
+    </style>
+</head>
+<body>
+    <!-- 弹窗公告（页面加载后居中显示） -->
+    <div class="modal-overlay" id="noticeModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 class="modal-title">📢 重要公告</h3>
+            <div class="modal-text">快手作品暂时仅支持刷10个点赞<br>加入QQ群：1073822261 获取更多功能</div>
+        </div>
+    </div>
+
+    <div id="likePage" class="page active">
+        <h2>快手视频点赞刷取</h2>
+        <input type="text" id="likeUrl" placeholder="输入快手视频链接" required>
+        <button class="like-btn" onclick="callLikeApi()">开始刷取</button>
+        <div id="likeResult">请点击按钮调用接口</div>
+        <div class="author">认准小安1073822261</div>
+    </div>
+
+    <div id="followPage" class="page">
+        <h2>快手用户关注刷取</h2>
+        <input type="text" id="followUrl" placeholder="输入快手用户链接" required>
+        <button class="follow-btn" onclick="callFollowApi()">开始刷取</button>
+        <div id="followResult">请点击按钮调用接口</div>
+        <div class="author">认准小安1073822261</div>
+    </div>
+
+    <div class="bottom-tab">
+        <button class="tab-btn active" onclick="switchPage('like')">点赞刷取</button>
+        <button class="tab-btn" onclick="switchPage('follow')">关注刷取</button>
+    </div>
+
+    <script>
+        // 关闭弹窗公告
+        function closeModal() {
+            document.getElementById('noticeModal').style.display = 'none';
+        }
+
+        function switchPage(type) {
+            const likePage = document.getElementById('likePage');
+            const followPage = document.getElementById('followPage');
+            const likeTab = document.querySelector('.tab-btn:nth-child(1)');
+            const followTab = document.querySelector('.tab-btn:nth-child(2)');
+
+            if (type === 'like') {
+                likePage.classList.add('active');
+                followPage.classList.remove('active');
+                likeTab.classList.add('active');
+                likeTab.classList.remove('follow-active');
+                followTab.classList.remove('active', 'follow-active');
+            } else {
+                followPage.classList.add('active');
+                likePage.classList.remove('active');
+                followTab.classList.add('active', 'follow-active');
+                likeTab.classList.remove('active');
+            }
+        }
+
+        async function callLikeApi() {
+            const ksUrl = document.getElementById('likeUrl').value.trim();
+            const resultDom = document.getElementById('likeResult');
+            
+            if (!ksUrl) {
+                resultDom.className = 'error';
+                resultDom.textContent = '请输入有效的快手视频链接';
+                return;
+            }
+
+            resultDom.textContent = '正在刷取点赞...';
+            const apiUrl = `http://qwtgbot.lilys.top/qwapi.php?url=${encodeURIComponent(ksUrl)}&tid=3139`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    mode: 'no-cors',
+                    headers: {
+                        'Accept': '*/*',
+                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
+                    }
+                });
+
+                if (response.type === 'opaque') {
+                    resultDom.className = 'success';
+                    resultDom.textContent = '已成功刷取点赞';
+                } else {
+                    resultDom.className = 'error';
+                    resultDom.textContent = '刷取失败，请重试';
+                }
+            } catch (error) {
+                resultDom.className = 'error';
+                resultDom.textContent = '刷取失败，请重试';
+            }
+        }
+
+        async function callFollowApi() {
+            const ksUrl = document.getElementById('followUrl').value.trim();
+            const resultDom = document.getElementById('followResult');
+            
+            if (!ksUrl) {
+                resultDom.className = 'error';
+                resultDom.textContent = '请输入有效的快手用户链接';
+                return;
+            }
+
+            resultDom.textContent = '正在刷取关注...';
+            const apiUrl = `http://qwtgbot.lilys.top/qwapi.php?url=${encodeURIComponent(ksUrl)}&tid=5378`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    mode: 'no-cors',
+                    headers: {
+                        'Accept': '*/*',
+                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
+                    }
+                });
+
+                if (response.type === 'opaque') {
+                    resultDom.className = 'success';
+                    resultDom.textContent = '已成功刷取关注';
+                } else {
+                    resultDom.className = 'error';
+                    resultDom.textContent = '刷取失败，请重试';
+                }
+            } catch (error) {
+                resultDom.className = 'error';
+                resultDom.textContent = '刷取失败，请重试';
+            }
+        }
+    </script>
+</body>
+</html>
